@@ -45,6 +45,8 @@ export class Entity extends GraphableObject
         this.ScaleY = this.ScaleY.bind(this);
         this.SetZOrder = this.SetZOrder.bind(this);
         this.CalculateTransform = this.CalculateTransform.bind(this);
+        this._SetRenderAttributes = this._SetRenderAttributes.bind(this);
+        this._Draw = this._Draw.bind(this);
     }
 
     SetWorld(newWorld)
@@ -147,6 +149,13 @@ export class Entity extends GraphableObject
     {
         super.Render();
 
+        this._SetRenderAttributes();
+
+        this._Draw();
+    }
+
+    _SetRenderAttributes()
+    {
         if (this.program && this.glContext && this.world)
         {
             this.glContext.useProgram(this.program);
@@ -159,8 +168,6 @@ export class Entity extends GraphableObject
 
             this.glContext.vertexAttribPointer(this.vertexAttrLocation, vertexSize, this.glContext.FLOAT, false, 0, 0);
 
-            this.glContext.bindBuffer(this.glContext.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-
             const projMat = this.world.projectionMatrix.clone();
             const viewMat = this.world.camera.CalculateTransform().clone();
             const modelMat = this.CalculateTransform().clone();
@@ -168,9 +175,14 @@ export class Entity extends GraphableObject
             const MVP = projMat.multiplyRight(viewMat.multiplyRight(modelMat));
 
             this.glContext.uniformMatrix4fv(this.mvpUniformLocation, false, MVP);
-            
-            this.glContext.drawElements(this.glContext.TRIANGLES, this.indices.length, this.glContext.UNSIGNED_SHORT, 0);
         }
+    }
+
+    _Draw()
+    {
+        this.glContext.bindBuffer(this.glContext.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+
+        this.glContext.drawElements(this.glContext.TRIANGLES, this.indices.length, this.glContext.UNSIGNED_SHORT, 0);
     }
 
     CalculateTransform()
@@ -179,8 +191,8 @@ export class Entity extends GraphableObject
         {
             let newTransform = new Matrix4().identity();
 
-            newTransform = newTransform.rotateZ(this.angle);
             newTransform = newTransform.translate(this.position);
+            newTransform = newTransform.rotateZ(this.angle);
             newTransform = newTransform.scale(this.scale);
 
             this.transform = newTransform;

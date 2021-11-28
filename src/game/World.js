@@ -51,6 +51,8 @@ export class World extends GraphableObject
 
         this.glContext.clearColor(0, 0, 0, 0);
         this.glContext.clear(this.glContext.COLOR_BUFFER_BIT);
+        this.glContext.enable(this.glContext.BLEND);
+        this.glContext.blendFunc(this.glContext.SRC_ALPHA, this.glContext.ONE_MINUS_SRC_ALPHA);
 
         this.glContext.enable(this.glContext.CULL_FACE);
 

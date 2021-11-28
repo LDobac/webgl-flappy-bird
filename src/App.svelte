@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from "svelte";
-	import { Entity, SpriteShaderProgram, World } from "./game";
+	import { Sprite, World } from "./game";
 
 	let canvas;
 
@@ -11,43 +11,30 @@
 			console.log("GL Context가 없음!");
 		}
 
-		const shaderProgram = new SpriteShaderProgram(glContext).program;
-
 		const myWorld = new World();
 		myWorld.SetUp(glContext);
 
-		const entity = new Entity();
-		entity.verticies = [
-			0, 0, 0,
-			0, 0.5, 0,
-			0.5, 0, 0,
-			0.5, 0.5, 0];
-		entity.indices = [2, 1, 0, 2, 3, 1];
-		entity.program = shaderProgram;
+		const sprite = new Sprite("./f-texture.png");
+		sprite.TranslateX(0.3);
+		sprite.Scale([0.7, 0.7, 0.7]);
 
-		const entity2 = new Entity();
-		entity2.verticies = [
-			0, 0, 0,
-			0, -0.5, 0,
-			-0.5, 0, 0,
-			-0.5, -0.5, 0];
-		entity2.indices = [2, 1, 0, 2, 3, 1];
-		entity2.program = shaderProgram;
+		const sprite2 = new Sprite("./clown_export-buff_2_0.png");
+		sprite2.TranslateX(-0.3);
+		sprite2.Scale([0.7, 0.7, 0.7]);
 
-		const entity3 = new Entity();
-		entity3.verticies = [
-			-0.5, -0.5, 0,
-			-0.5, -1, 0,
-			-1, -0.5, 0,
-			-1, -1, 0];
-		entity3.indices = [2, 1, 0, 2, 3, 1];
-		entity3.program = shaderProgram;
+		myWorld.AddEntity(sprite);
+		myWorld.AddEntity(sprite2);
 
-		myWorld.AddEntity(entity);
-		myWorld.AddEntity(entity2);
-		myWorld.AddEntity(entity3);
+		const render = () => {
+			sprite.Rotate(sprite.angle - 0.05);
+			sprite2.Rotate(sprite2.angle + 0.05);
 
-		myWorld.Render();
+			myWorld.Render();
+
+			requestAnimationFrame(render);
+		}
+
+		render();
 	})
 
 	export let name;

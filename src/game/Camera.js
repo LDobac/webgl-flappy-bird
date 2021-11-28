@@ -19,10 +19,6 @@ export class Camera extends Entity
     {
         if (this.isTransformDirty)
         {
-            // let lookAt = this.position.clone();
-            // lookAt.z = -1;
-            // this.viewMatrix = new Matrix4().lookAt(this.position, lookAt, this.upVector);
-
             this.viewMatrix = (new Matrix4().rotateZ(this.angle)).invert().multiplyRight(new Matrix4().translate(this.position).invert());
         }
 

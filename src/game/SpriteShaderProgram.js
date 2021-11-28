@@ -8,25 +8,28 @@ export class SpriteShaderProgram extends ShaderProgram
 
         this.rawVertexShader = `
         attribute vec4 vPosition;
-        attribute vec4 vTexCoord;
+        attribute vec2 vTexCoord;
 
         uniform mat4 MVP;
 
-        varying vec4 fTexCoord;
+        varying vec2 fTexCoord;
         
         void main() {
         
             gl_Position = MVP * vPosition;
+
+            fTexCoord = vTexCoord;
         }
         `;
 
         this.rawFragShader = `
         precision mediump float;
 
-        varying vec4 fTexCoord;
+        varying vec2 fTexCoord;
+        uniform sampler2D texture;
         
         void main() {
-            gl_FragColor = vec4(0, 1, 0.5, 1);
+            gl_FragColor = texture2D(texture, fTexCoord);
         }
         `; 
 

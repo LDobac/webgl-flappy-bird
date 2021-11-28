@@ -4,6 +4,7 @@ import { GraphableObject } from "./GraphableObject";
 import { ShaderProgram } from "./ShaderProgram";
 import { SpriteShaderProgram } from "./SpriteShaderProgram";
 import { World } from "./World";
+import { Sprite } from "./Sprite";
 
 export {
     Camera,
@@ -11,5 +12,6 @@ export {
     GraphableObject,
     ShaderProgram,
     SpriteShaderProgram,
-    World
+    World,
+    Sprite
 }
