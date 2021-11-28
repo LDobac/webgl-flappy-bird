@@ -21,9 +21,14 @@ export class Entity extends GraphableObject
         this.vertexBuffer = null;
         this.vertexAttrLocation = null;
 
+        this.indices = [];
+        this.indexBuffer = null;
+
+        this.mvpUniformLocation = null;
+
         this.position = new Vector3();
         this.angle = 0.0;
-        this.scale = new Vector3();
+        this.scale = new Vector3(1, 1, 1);
 
         this.transform = new Matrix4().identity();
 
@@ -52,11 +57,20 @@ export class Entity extends GraphableObject
         // Initialize mesh and render data;
         this.glContext = glContext;
 
+        // Set vertex buffer
         this.vertexAttrLocation = this.glContext.getAttribLocation(this.program, "vPosition");
 
         this.vertexBuffer = this.glContext.createBuffer();
         this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.vertexBuffer);
         this.glContext.bufferData(this.glContext.ARRAY_BUFFER, new Float32Array(this.verticies), this.glContext.STATIC_DRAW);
+
+        // Set index buffer
+        this.indexBuffer = this.glContext.createBuffer();
+        this.glContext.bindBuffer(this.glContext.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+        this.glContext.bufferData(this.glContext.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.indices), this.glContext.STATIC_DRAW);
+
+        // Set MVP uniform location
+        this.mvpUniformLocation = this.glContext.getUniformLocation(this.program, "MVP");
     }
 
     Translate(newPosition)
@@ -137,15 +151,25 @@ export class Entity extends GraphableObject
         {
             this.glContext.useProgram(this.program);
 
+            this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.vertexBuffer);
+            
             this.glContext.enableVertexAttribArray(this.vertexAttrLocation);
 
-            this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.vertexBuffer);
-
-            const vertexSize = 2;
+            const vertexSize = 3;
 
             this.glContext.vertexAttribPointer(this.vertexAttrLocation, vertexSize, this.glContext.FLOAT, false, 0, 0);
 
-            this.glContext.drawArrays(this.glContext.TRIANGLES, 0, 3);
+            this.glContext.bindBuffer(this.glContext.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+
+            const projMat = this.world.projectionMatrix.clone();
+            const viewMat = this.world.camera.CalculateTransform().clone();
+            const modelMat = this.CalculateTransform().clone();
+
+            const MVP = projMat.multiplyRight(viewMat.multiplyRight(modelMat));
+
+            this.glContext.uniformMatrix4fv(this.mvpUniformLocation, false, MVP);
+            
+            this.glContext.drawElements(this.glContext.TRIANGLES, this.indices.length, this.glContext.UNSIGNED_SHORT, 0);
         }
     }
 
@@ -155,7 +179,7 @@ export class Entity extends GraphableObject
         {
             let newTransform = new Matrix4().identity();
 
-            newTransform = newTransform.rotateZ(angle);
+            newTransform = newTransform.rotateZ(this.angle);
             newTransform = newTransform.translate(this.position);
             newTransform = newTransform.scale(this.scale);
 

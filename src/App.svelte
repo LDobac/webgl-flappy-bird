@@ -17,10 +17,35 @@
 		myWorld.SetUp(glContext);
 
 		const entity = new Entity();
-		entity.verticies = [0, 0, 0, 0.5, 0.7, 0,];
+		entity.verticies = [
+			0, 0, 0,
+			0, 0.5, 0,
+			0.5, 0, 0,
+			0.5, 0.5, 0];
+		entity.indices = [2, 1, 0, 2, 3, 1];
 		entity.program = shaderProgram;
 
+		const entity2 = new Entity();
+		entity2.verticies = [
+			0, 0, 0,
+			0, -0.5, 0,
+			-0.5, 0, 0,
+			-0.5, -0.5, 0];
+		entity2.indices = [2, 1, 0, 2, 3, 1];
+		entity2.program = shaderProgram;
+
+		const entity3 = new Entity();
+		entity3.verticies = [
+			-0.5, -0.5, 0,
+			-0.5, -1, 0,
+			-1, -0.5, 0,
+			-1, -1, 0];
+		entity3.indices = [2, 1, 0, 2, 3, 1];
+		entity3.program = shaderProgram;
+
 		myWorld.AddEntity(entity);
+		myWorld.AddEntity(entity2);
+		myWorld.AddEntity(entity3);
 
 		myWorld.Render();
 	})

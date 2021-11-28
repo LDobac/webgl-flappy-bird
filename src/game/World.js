@@ -8,7 +8,7 @@ export class World extends GraphableObject
     {
         super();
 
-        this.projectionMatrix = new Matrix4().ortho({left: -100, right: 100, bottom:-100, top:100});
+        this.projectionMatrix = null;
 
         this.glContext = null;
 
@@ -23,6 +23,14 @@ export class World extends GraphableObject
     SetUp(glContext)
     {
         this.glContext = glContext;
+
+        this.projectionMatrix = new Matrix4().orthographic({
+            fovy : 90 * (Math.PI / 180),
+            aspect : this.glContext.canvas.width / this.glContext.canvas.height,
+            focalDistance : 1,
+            near : 0.1,
+            far : 100    
+        });
     }
 
     Start()
@@ -41,8 +49,10 @@ export class World extends GraphableObject
 
         this.glContext.viewport(0, 0, this.glContext.canvas.width, this.glContext.canvas.height);
 
-        this.glContext.clearColor(0, 1, 0, 1);
+        this.glContext.clearColor(0, 0, 0, 0);
         this.glContext.clear(this.glContext.COLOR_BUFFER_BIT);
+
+        this.glContext.enable(this.glContext.CULL_FACE);
 
         for (const entity of this.entities) 
         {
