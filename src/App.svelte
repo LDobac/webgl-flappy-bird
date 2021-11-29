@@ -29,6 +29,18 @@
 			sprite.Rotate(sprite.angle - 0.05);
 			sprite2.Rotate(sprite2.angle + 0.05);
 
+			if (myWorld.input.IsKeyDown("e"))
+			{
+				console.log("E has pressed");
+			}
+
+			if (myWorld.input.IsMouseClick())
+			{
+				console.log("Left mouse clicked");
+			}
+
+			myWorld.Update();
+
 			myWorld.Render();
 
 			requestAnimationFrame(render);

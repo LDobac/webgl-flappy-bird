@@ -1,12 +1,17 @@
 import { Matrix4 } from "@math.gl/core";
 import { Camera } from "./Camera";
 import { GraphableObject } from "./GraphableObject";
+import { Input } from "./Input";
+import { Time } from "./Time";
 
 export class World extends GraphableObject
 {
     constructor()
     {
         super();
+
+        this.time = new Time();
+        this.input = new Input();
 
         this.projectionMatrix = null;
 
@@ -31,6 +36,9 @@ export class World extends GraphableObject
             near : 0.1,
             far : 100    
         });
+
+        this.time.Initailize();
+        this.input.Initailize();
     }
 
     Start()
@@ -41,6 +49,9 @@ export class World extends GraphableObject
     Update()
     {
         super.Update();
+
+        this.time.Update();
+        this.input.Update();
     }
 
     Render()
