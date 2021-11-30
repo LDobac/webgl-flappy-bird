@@ -7,9 +7,8 @@ export class Entity extends GraphableObject
     {
         super();
 
-        this.isTransformDirty = true;
-
         this.world = null;
+        this.parent = null;
 
         /**
          * @type WebGLRenderingContext
@@ -55,6 +54,11 @@ export class Entity extends GraphableObject
         this.world = newWorld;
     }
 
+    SetParent(newParent)
+    {
+        this.parent = newParent;
+    }
+
     InitMesh(glContext)
     {
         // Initialize mesh and render data;
@@ -81,29 +85,21 @@ export class Entity extends GraphableObject
         if (newPosition.constructor == Vector3) throw new TypeError("newPosition is not Vector3!");
 
         this.position = newPosition;
-
-        this.isTransformDirty = true;
     }
 
     TranslateX(newX)
     {
         this.position.x = newX;
-
-        this.isTransformDirty = true;
     }
 
     TranslateY(newY)
     {
         this.position.y = newY;
-
-        this.isTransformDirty = true;
     }
 
     Rotate(newAngle)
     {
         this.angle = newAngle;
-
-        this.isTransformDirty = true;
     }
 
     Scale(newScale)
@@ -111,29 +107,21 @@ export class Entity extends GraphableObject
         if (newScale.constructor == Vector3) throw new TypeError("newPosition is not Vector3!");
 
         this.scale = newScale;
-
-        this.isTransformDirty = true;
     }
 
     ScaleX(newScaleX)
     {
         this.scale.x = newScaleX;   
-
-        this.isTransformDirty = true;
     }
 
     ScaleY(newScaleY)
     {
         this.scale.y = newScaleY;
-
-        this.isTransformDirty = true;
     }
 
     SetZOrder(newZOrder)
     {
         this.zOrder = newZOrder;
-
-        this.isTransformDirty = true;
     }
 
     Start()
@@ -206,18 +194,22 @@ export class Entity extends GraphableObject
 
     CalculateTransform()
     {
-        if (this.isTransformDirty)
+        let newTransform = new Matrix4().identity();
+
+        newTransform = newTransform.translate(this.position);
+        newTransform = newTransform.rotateZ(this.angle);
+        newTransform = newTransform.scale(this.scale);
+
+        if (this.parent)
         {
-            let newTransform = new Matrix4().identity();
+            const parentTransform = this.parent.CalculateTransform().clone();
 
-            newTransform = newTransform.translate(this.position);
-            newTransform = newTransform.rotateZ(this.angle);
-            newTransform = newTransform.scale(this.scale);
-
+            this.transform = parentTransform.multiplyRight(newTransform);
+        }
+        else
+        {
             this.transform = newTransform;
         }
-
-        this.isTransformDirty = false;
 
         return this.transform;
     }

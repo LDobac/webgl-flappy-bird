@@ -2,7 +2,6 @@
 	import Canvas from "./Canvas.svelte";
 </script>
 
-<!-- {@debug} -->
 <main>
 	<div class="graph-script">
 		<p>Hello, World!</p>

@@ -22,6 +22,8 @@
 		sprite2.TranslateX(-0.3);
 		sprite2.Scale([0.7, 0.7, 0.7]);
 
+		sprite2.SetParent(sprite);
+
 		myWorld.AddEntity(sprite);
 		myWorld.AddEntity(sprite2);
 
@@ -29,13 +31,11 @@
 			if (myWorld.input.IsKeyDown("e"))
 			{
 				sprite.Rotate(sprite.angle - 0.05);
-				console.log("E has pressed");
 			}
 
 			if (myWorld.input.IsMouseClick())
 			{
-				myWorld.RemoveEntity(sprite2);
-				console.log("Left mouse clicked");
+				sprite2.Rotate(sprite2.angle + 0.05);
 			}
 
 			myWorld.Update();
@@ -49,6 +49,7 @@
 	});
 </script>
 
+<!-- {@debug} -->
 <div class="game-canvas">
     <canvas bind:this={canvas} width="500" height="500"></canvas>
 </div>

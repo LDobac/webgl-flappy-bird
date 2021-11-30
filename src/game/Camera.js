@@ -17,12 +17,7 @@ export class Camera extends Entity
 
     CalculateTransform()
     {
-        if (this.isTransformDirty)
-        {
-            this.viewMatrix = (new Matrix4().rotateZ(this.angle)).invert().multiplyRight(new Matrix4().translate(this.position).invert());
-        }
-
-        this.isTransformDirty = false;
+        this.viewMatrix = (new Matrix4().rotateZ(this.angle)).invert().multiplyRight(new Matrix4().translate(this.position).invert());
 
         return this.viewMatrix;
     }
