@@ -47,6 +47,7 @@ export class Entity extends GraphableObject
         this.CalculateTransform = this.CalculateTransform.bind(this);
         this._SetRenderAttributes = this._SetRenderAttributes.bind(this);
         this._Draw = this._Draw.bind(this);
+        this.Release = this.Release.bind(this);
     }
 
     SetWorld(newWorld)
@@ -152,6 +153,24 @@ export class Entity extends GraphableObject
         this._SetRenderAttributes();
 
         this._Draw();
+    }
+
+    Release()
+    {
+        if (this.vertexBuffer)
+        {
+            this.glContext.deleteBuffer(this.vertexBuffer);
+        }
+
+        if (this.indexBuffer)
+        {
+            this.glContext.deleteBuffer(this.indexBuffer);
+        }
+
+        if (this.program)
+        {
+            this.glContext.deleteProgram(this.program);
+        }
     }
 
     _SetRenderAttributes()

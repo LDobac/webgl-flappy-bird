@@ -135,4 +135,19 @@ export class Sprite extends Entity
 
         this._Draw();
     }
+
+    Release()
+    {
+        super.Release();
+
+        if (this.texCoordBuffer)
+        {
+            this.glContext.deleteBuffer(this.texCoordBuffer);
+        }
+
+        if (this.texture)
+        {
+            this.glContext.deleteTexture(this.texture);
+        }
+    }
 }

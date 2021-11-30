@@ -85,12 +85,14 @@ export class World extends GraphableObject
 
     RemoveEntity(entity)
     {
-        let index = this.entities.findIndex(entity);
+        let index = this.entities.findIndex((element) => element == entity);
 
         if (index > -1)
         {
             this.entities.splice(index, 1);
         }
+
+        entity.Release();
     }
 
     SortEntities()
