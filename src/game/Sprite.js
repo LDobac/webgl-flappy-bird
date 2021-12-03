@@ -1,7 +1,7 @@
-import { Texture } from ".";
 import { AABB } from "./AABB";
 import { Entity } from "./Entity";
 import { SpriteShaderProgram } from "./SpriteShaderProgram"
+import { Texture } from "./Texture";
 
 export class Sprite extends Entity
 {

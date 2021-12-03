@@ -1,12 +1,8 @@
-import { AABB, CollisionBoxShaderProgram } from ".";
+import { CollisionBoxShaderProgram } from "./CollisionBoxShaderProgram";
 import { Entity } from "./Entity";
 
 export class DebugCollisionRenderer extends Entity
 {
-    /**
-     * 
-     * @param {AABB} collisionBox 
-     */
     constructor(collisionBox)
     {
         super();
