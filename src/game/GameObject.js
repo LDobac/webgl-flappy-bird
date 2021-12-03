@@ -1,4 +1,4 @@
-export class GraphableObject
+export class GameObject
 {
     constructor() 
     {

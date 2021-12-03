@@ -1,6 +1,6 @@
 import { Camera } from "./Camera";
 import { Entity } from "./Entity";
-import { GraphableObject } from "./GraphableObject";
+import { GameObject } from "./GameObject";
 import { ShaderProgram } from "./ShaderProgram";
 import { SpriteShaderProgram } from "./SpriteShaderProgram";
 import { World } from "./World";
@@ -12,7 +12,7 @@ import { CollisionBoxShaderProgram } from "./CollisionBoxShaderProgram";
 export {
     Camera,
     Entity,
-    GraphableObject,
+    GameObject,
     ShaderProgram,
     SpriteShaderProgram,
     World,

@@ -1,7 +1,7 @@
 import { Matrix4, Vector3 } from "@math.gl/core";
-import { GraphableObject } from "./GraphableObject";
+import { GameObject } from "./GameObject";
 
-export class Entity extends GraphableObject
+export class Entity extends GameObject
 {
     constructor() 
     {

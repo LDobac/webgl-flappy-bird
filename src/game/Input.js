@@ -48,9 +48,7 @@ export class Input
         });
     }
 
-    Update()
-    {
-    }
+    Update() { }
 
     IsMouseClick(right = false)
     {

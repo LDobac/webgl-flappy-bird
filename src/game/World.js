@@ -1,10 +1,10 @@
 import { Matrix4 } from "@math.gl/core";
 import { Camera } from "./Camera";
-import { GraphableObject } from "./GraphableObject";
+import { GameObject } from "./GameObject";
 import { Input } from "./Input";
 import { Time } from "./Time";
 
-export class World extends GraphableObject
+export class World extends GameObject
 {
     constructor()
     {
