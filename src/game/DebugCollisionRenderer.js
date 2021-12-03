@@ -27,6 +27,8 @@ export class DebugCollisionRenderer extends Entity
         this.program = new CollisionBoxShaderProgram(glContext).program;
 
         super.InitMesh(glContext);
+
+        this.zOrder = 1000;
     }
 
     Render()

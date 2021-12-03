@@ -20,7 +20,7 @@ export class CollisionBoxShaderProgram extends ShaderProgram
         precision mediump float;
 
         void main() {
-            gl_FragColor = vec4(1, 0.6, 0.4, 1);
+            gl_FragColor = vec4(1, 0.6, 0.4, 0.3);
         }
         `; 
 

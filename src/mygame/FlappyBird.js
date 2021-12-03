@@ -5,7 +5,17 @@ export class FlappyBird extends Sprite
 {
     constructor()
     {
-        super("./images/bird_1.png");
+        // https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+        function getRandomInt(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min)) + min; //최댓값은 제외, 최솟값은 포함
+        }
+        let birdColor = getRandomInt(0, 3);
+
+        super(`./images/bird_${birdColor}_1.png`);
+        
+        this.birdColor = birdColor;
         
         this.velocity = new Vector3(0, 0, 0);
         this.gravity = -4;
@@ -20,9 +30,9 @@ export class FlappyBird extends Sprite
         this.Scale([0.1, 0.1, 0.1]);
 
         this.AddAnimation([
-            "./images/bird_1.png",
-            "./images/bird_2.png",
-            "./images/bird_3.png",
+            `./images/bird_${this.birdColor}_1.png`,
+            `./images/bird_${this.birdColor}_2.png`,
+            `./images/bird_${this.birdColor}_3.png`,
         ], 0.05);
     }
 
@@ -66,6 +76,6 @@ export class FlappyBird extends Sprite
 
     Lerp (start, end, step)
     {
-        return (1 - step) * start + (step * end)
+        return (1 - step) * start + (step * end);
     }
 }
