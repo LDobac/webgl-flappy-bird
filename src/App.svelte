@@ -1,6 +1,5 @@
 <script>
 import { onMount } from "svelte";
-
 	import Canvas from "./Canvas.svelte";
 
 	let maxScore = 0;
