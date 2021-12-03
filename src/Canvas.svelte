@@ -1,8 +1,14 @@
 <script>
     import { onMount } from "svelte";
-	import { Sprite, World } from "./game";
+	import { FlappyBirdWorld } from "./mygame/FlappyBirdWorld";
 
     let canvas;
+
+	// Fit to background image size
+	const canvasWidth = 143 * 2;
+	const canvasHeight = 256 * 2;
+
+	const myWorld = new FlappyBirdWorld();
 
 	onMount(() => {
 		const glContext = canvas.getContext("webgl");
@@ -11,47 +17,29 @@
 			console.log("GL Context가 없음!");
 		}
 
-		const myWorld = new World();
 		myWorld.SetUp(glContext);
 
-		const sprite = new Sprite("./f-texture.png");
-		sprite.TranslateX(0.3);
-		sprite.Scale([0.7, 0.7, 0.7]);
-
-		const sprite2 = new Sprite("./clown_export-buff_2_0.png");
-		sprite2.TranslateX(-0.3);
-		sprite2.Scale([0.7, 0.7, 0.7]);
-
-		sprite2.SetParent(sprite);
-
-		myWorld.AddEntity(sprite);
-		myWorld.AddEntity(sprite2);
-
 		const render = () => {
-			if (myWorld.input.IsKeyDown("e"))
-			{
-				sprite.Rotate(sprite.angle - 0.05);
-			}
-
-			if (myWorld.input.IsMouseClick())
-			{
-				sprite2.Rotate(sprite2.angle + 0.05);
-			}
-
 			myWorld.Update();
 
 			myWorld.Render();
+
+			score = myWorld.score;
+			gameover = myWorld.gameover;
 
 			requestAnimationFrame(render);
 		}
 
 		render();
 	});
+
+	export let score = 0;
+	export let gameover = false;
 </script>
 
 <!-- {@debug} -->
 <div class="game-canvas">
-    <canvas bind:this={canvas} width="500" height="500"></canvas>
+    <canvas bind:this={canvas} width={canvasWidth} height={canvasHeight}></canvas>
 </div>
 
 <style>

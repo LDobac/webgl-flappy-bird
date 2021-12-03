@@ -1,3 +1,5 @@
+import { Texture } from ".";
+import { AABB } from "./AABB";
 import { Entity } from "./Entity";
 import { SpriteShaderProgram } from "./SpriteShaderProgram"
 
@@ -24,11 +26,16 @@ export class Sprite extends Entity
         this.texCoordBuffer = null;
         this.texCoordAttrLocation = null;
 
-        this.texture = null;
         this.textureUniformLocation = null;
+        this.texture = new Texture(imgSrc);
 
-        this.image = null;
-        this.src = imgSrc;
+        this.animTimer = 0;
+        this.curAnimIndex = 0;
+        this.animDelay = 0;
+        this.animationFrame = [];
+
+        this.collisionBox = new AABB(this, -0.5, -0.5, 1, 1, this.scale);
+        this.debugCollisionBox = false;
     }
 
     InitMesh(glContext)
@@ -43,63 +50,10 @@ export class Sprite extends Entity
         this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.texCoordBuffer);
         this.glContext.bufferData(this.glContext.ARRAY_BUFFER, new Float32Array(this.texCoord), this.glContext.STATIC_DRAW);
 
-        this.texture = this.glContext.createTexture();
-        this.glContext.bindTexture(this.glContext.TEXTURE_2D, this.texture);
-
-        // Create temporary image
-        this.glContext.texImage2D(
-            this.glContext.TEXTURE_2D,
-            0,
-            this.glContext.RGBA,
-            1,
-            1,
-            0,
-            this.glContext.RGBA,
-            this.glContext.UNSIGNED_BYTE,
-            new Uint8Array([63, 16, 127, 86])
-        );
-
-        this.image = new Image();
-        this.image.src = this.src;
-        this.image.addEventListener("load", () => {
-            const imageWidth = this.image.width;
-            const imageHeight = this.image.height;
+        this.texture.imageLoadHanlder = () => {
+            const imageWidth = this.texture.width;
+            const imageHeight = this.texture.height;
             const imageRatio = imageWidth / imageHeight;
-
-            this.glContext.bindTexture(this.glContext.TEXTURE_2D, this.texture);
-
-            this.glContext.pixelStorei(this.glContext.UNPACK_FLIP_Y_WEBGL, true);
-
-            this.glContext.texImage2D(
-                this.glContext.TEXTURE_2D, 
-                0, 
-                this.glContext.RGBA, 
-                this.glContext.RGBA, 
-                this.glContext.UNSIGNED_BYTE, 
-                this.image
-            );
-
-            const IsPowerOfTwo = (x) => {
-                return (x & (x - 1)) == 0;
-            }
-
-            if ( IsPowerOfTwo(imageWidth) && IsPowerOfTwo(imageHeight)) 
-            {
-                // If texture power of two
-                this.glContext.generateMipmap(this.glContext.TEXTURE_2D);
-
-                this.glContext.texParameteri(this.glContext.TEXTURE_2D, this.glContext.TEXTURE_MIN_FILTER, this.glContext.NEAREST);
-                this.glContext.texParameteri(this.glContext.TEXTURE_2D, this.glContext.TEXTURE_MAG_FILTER, this.glContext.NEAREST);
-            }
-            else
-            {
-                // If texture not power of two
-                this.glContext.texParameteri(this.glContext.TEXTURE_2D, this.glContext.TEXTURE_MAG_FILTER, this.glContext.LINEAR);
-                this.glContext.texParameteri(this.glContext.TEXTURE_2D, this.glContext.TEXTURE_MIN_FILTER, this.glContext.LINEAR);
-    
-                this.glContext.texParameteri(this.glContext.TEXTURE_2D, this.glContext.TEXTURE_WRAP_S, this.glContext.CLAMP_TO_EDGE);
-                this.glContext.texParameteri(this.glContext.TEXTURE_2D, this.glContext.TEXTURE_WRAP_T, this.glContext.CLAMP_TO_EDGE);
-            }
 
             // Move vertex to correct position
             let w = ((imageWidth / 2) / imageWidth) * imageRatio;
@@ -114,9 +68,54 @@ export class Sprite extends Entity
 
             this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.vertexBuffer);
             this.glContext.bufferData(this.glContext.ARRAY_BUFFER, new Float32Array(this.verticies), this.glContext.STATIC_DRAW);
-        });
+
+            // Resetting collision box
+            this.collisionBox.x = -w;
+            this.collisionBox.y = -h;
+            this.collisionBox.width = 2 * w;
+            this.collisionBox.height = 2 * h;
+        };
+        this.texture.InitTexture(glContext);
 
         this.textureUniformLocation = this.glContext.getUniformLocation(this.program, "texture");
+
+        // Init for debugging collision box
+        if (this.debugCollisionBox)
+        {
+            this.collisionBox.debugEntity.InitMesh(this.glContext);
+            this.world.AddEntity(this.collisionBox.debugEntity);
+        }
+    }
+
+    AddAnimation(srcList, delayPerFrame)
+    {
+        this.animDelay = delayPerFrame;
+
+        for (const src of srcList) 
+        {
+            const frame = new Texture(src);
+            frame.InitTexture(this.glContext);
+
+            this.animationFrame.push(frame);
+        }
+    }
+
+    Update()
+    {
+        super.Update();
+
+        if (this.world)
+        {
+            if (this.animationFrame.length)
+            {
+                this.animTimer += this.world.time.deltaTime;
+                if (this.animTimer > this.animDelay)
+                {
+                    this.animTimer = 0;
+                    this.curAnimIndex = (this.curAnimIndex + 1) % this.animationFrame.length;
+                }
+            }
+        }
     }
 
     Render()
@@ -130,7 +129,15 @@ export class Sprite extends Entity
         this.glContext.enableVertexAttribArray(this.texCoordAttrLocation);
 
         this.glContext.activeTexture(this.glContext.TEXTURE0);
-        this.glContext.bindTexture(this.glContext.TEXTURE_2D, this.texture);
+        if (this.animationFrame.length)
+        {
+            const currentFrame = this.animationFrame[this.curAnimIndex];
+            currentFrame.BindTexture();
+        }
+        else
+        {
+            this.texture.BindTexture();
+        }
         this.glContext.uniform1i(this.textureUniformLocation, 0);
 
         this._Draw();
@@ -147,7 +154,36 @@ export class Sprite extends Entity
 
         if (this.texture)
         {
-            this.glContext.deleteTexture(this.texture);
+            this.texture.Release();
         }
+
+        if(this.animationFrame.length)
+        {
+            for (const frame of this.animationFrame) 
+            {
+                frame.Release();
+            }
+        }
+    }
+
+    Scale(newScale)
+    {
+        super.Scale(newScale);
+
+        this.collisionBox.scale = this.scale;
+    }
+
+    ScaleX(newScaleX)
+    {
+        super.ScaleX(newScaleX);
+
+        this.collisionBox.scale = this.scale;
+    }
+
+    ScaleY(newScaleY)
+    {
+        super.ScaleY(newScaleY);
+
+        this.collisionBox.scale = this.scale;
     }
 }

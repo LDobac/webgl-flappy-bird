@@ -64,20 +64,23 @@ export class Entity extends GraphableObject
         // Initialize mesh and render data;
         this.glContext = glContext;
 
-        // Set vertex buffer
-        this.vertexAttrLocation = this.glContext.getAttribLocation(this.program, "vPosition");
-
-        this.vertexBuffer = this.glContext.createBuffer();
-        this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.vertexBuffer);
-        this.glContext.bufferData(this.glContext.ARRAY_BUFFER, new Float32Array(this.verticies), this.glContext.STATIC_DRAW);
-
-        // Set index buffer
-        this.indexBuffer = this.glContext.createBuffer();
-        this.glContext.bindBuffer(this.glContext.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-        this.glContext.bufferData(this.glContext.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.indices), this.glContext.STATIC_DRAW);
-
-        // Set MVP uniform location
-        this.mvpUniformLocation = this.glContext.getUniformLocation(this.program, "MVP");
+        if (this.verticies.length && this.indices.length && this.program)
+        {
+            // Set vertex buffer
+            this.vertexAttrLocation = this.glContext.getAttribLocation(this.program, "vPosition");
+    
+            this.vertexBuffer = this.glContext.createBuffer();
+            this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.vertexBuffer);
+            this.glContext.bufferData(this.glContext.ARRAY_BUFFER, new Float32Array(this.verticies), this.glContext.STATIC_DRAW);
+    
+            // Set index buffer
+            this.indexBuffer = this.glContext.createBuffer();
+            this.glContext.bindBuffer(this.glContext.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+            this.glContext.bufferData(this.glContext.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.indices), this.glContext.STATIC_DRAW);
+    
+            // Set MVP uniform location
+            this.mvpUniformLocation = this.glContext.getUniformLocation(this.program, "MVP");
+        }
     }
 
     Translate(newPosition)
@@ -187,9 +190,12 @@ export class Entity extends GraphableObject
 
     _Draw()
     {
-        this.glContext.bindBuffer(this.glContext.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-
-        this.glContext.drawElements(this.glContext.TRIANGLES, this.indices.length, this.glContext.UNSIGNED_SHORT, 0);
+        if (this.program && this.glContext && this.world)
+        {
+            this.glContext.bindBuffer(this.glContext.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+    
+            this.glContext.drawElements(this.glContext.TRIANGLES, this.indices.length, this.glContext.UNSIGNED_SHORT, 0);
+        }
     }
 
     CalculateTransform()

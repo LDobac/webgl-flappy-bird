@@ -13,6 +13,8 @@ export class World extends GraphableObject
         this.time = new Time();
         this.input = new Input();
 
+        this.stopTime = false;
+
         this.projectionMatrix = null;
 
         this.glContext = null;
@@ -23,6 +25,8 @@ export class World extends GraphableObject
         this.AddEntity = this.AddEntity.bind(this);
         this.RemoveEntity = this.RemoveEntity.bind(this);
         this.SortEntities = this.SortEntities.bind(this);
+        this.StopTime = this.StopTime.bind(this);
+        this.ResumeTime = this.ResumeTime.bind(this);
     }
 
     SetUp(glContext)
@@ -50,8 +54,17 @@ export class World extends GraphableObject
     {
         super.Update();
 
-        this.time.Update();
+        if (!this.stopTime)
+        {
+            this.time.Update();
+        }
+
         this.input.Update();
+
+        for (const entity of this.entities) 
+        {
+            entity.Update();    
+        }
     }
 
     Render()
@@ -75,8 +88,8 @@ export class World extends GraphableObject
 
     AddEntity(newEntity)
     {
-        newEntity.InitMesh(this.glContext);
         newEntity.SetWorld(this);
+        newEntity.InitMesh(this.glContext);
 
         this.entities.push(newEntity);
 
@@ -110,5 +123,16 @@ export class World extends GraphableObject
             
             return 0;
         });
+    }
+
+    StopTime()
+    {
+        this.stopTime = true;
+        this.time.deltaTime = 0;
+    }
+
+    ResumeTime()
+    {
+        this.stopTime = false;
     }
 }
